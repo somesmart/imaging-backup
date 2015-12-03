@@ -1,0 +1,88 @@
+1. Install python
+2. Install pip
+3. Install mysql
+	a. sudo apt-get install mysql
+	b. sudo apt-get install libmysqlclient-dev
+	c. sudo pip instally mysql-python
+	d. create django database
+		i. CREATE DATABASE `django` DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+	e. set up django sql account
+		i. GRANT ALL PRIVILEGES ON django.* TO 'django'@'localhost' IDENTIFIED BY 'your_password' WITH GRANT OPTION;
+		ii. FLUSH PRIVILEGES;
+4. Install django
+	a. pip install django
+	b. mkdir /home/user/django/
+	c. cd /home/user/django/
+	d. django-admin startproject insmgmt
+	e. setup static file locations
+		i. mkdir mkdir /var/www /var/www/static var/www/media
+		ii. chown -R pi:www-data /var/www/
+	f. nano /insmgmt/settings.py 
+		i. set database engine to 'django.db.backends.mysql'
+		ii. set database name, user, password
+		iii. STATIC_ROOT = '/var/wwww/static/'
+	f. python manage.py migrate
+5. Get Web-Serving ready
+	a. install gunicorn
+		i. pip install gunicorn
+	b. install supervisor
+		i. apt-get install supervisor
+		ii. nano /etc/supervisor/conf.d/gunicorn.conf
+		iii. 	[program:gunicorn]
+				command = /usr/bin/python /usr/local/bin/gunicorn insmgmt.wsgi:application
+				directory = /home/pi/django/insmgmt/
+				user = pi
+				autostart = true
+				autorestart = true
+				stdout_logfile = /var/log/supervisor/gunicorn.log
+				stderr_logfile = /var/log/supervisor/gunicorn_err.log
+		iv. sudo supervisorctl reread
+		v.  sudo supervisorctl update
+		vi. sudo supervisorctl status
+			(1) Expected response: gunicorn                         RUNNING    pid 17790, uptime 0:00:05
+			(2) See logs otherwise
+		vii. python manage.py collectstatic
+		viii. apt-get install nginx
+		ix. cd /etc/nginx/sites-available/
+		x. nano insmgmt
+				(1) upstream gunicorn {
+					    server 127.0.0.1:8000;	
+					}
+
+					# define an nginx server at port 80
+					server {
+					    # listen on port 80
+					    listen 80;
+
+					    # look in this directory for files to serve
+					    root /var/www/;
+
+					    # keep logs in these files
+					    access_log /var/log/nginx/insmgmt_access.log;
+					    error_log /var/log/nginx/insmgmt_error.log;
+
+					    client_max_body_size 0;
+
+					    # Attempt to serve files first, then pass the request up to Gunicorn
+					    try_files $uri @gunicorn;
+
+					    # define rules for gunicorn
+					    location @gunicorn {
+					        client_max_body_size 0;
+					        proxy_pass http://gunicorn;
+					        proxy_redirect off;
+					        proxy_read_timeout 5m;
+
+					        # make sure these HTTP headers are set properly
+					        proxy_set_header Host            $host;
+					        proxy_set_header X-Real-IP       $remote_addr;
+					        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+					    }
+					}
+		xi. cd /etc/nginx/sites-enabled
+		xii. ln -s ../sites-available/insmgmt
+		xiii. rm default
+		xiv. service nginx restart
+5. Copy the django file information over to the new device
+6. Setup the Dropbox sync
+	a. Follow the instructions here https://github.com/andreafabrizi/Dropbox-Uploader		

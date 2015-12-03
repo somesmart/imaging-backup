@@ -1,0 +1,26 @@
+{% extends "insfiles/base.html" %}
+{% block content %}
+
+<div class="md-content">
+	<div class="box-info col-sm-4">
+		<h3>Scan a new file</h3>
+		<div id="basic-form" class="collapse in">
+			<form role="form" action="" method="post" enctype="multipart/form-data">
+				{% csrf_token %}
+				<table>
+					{{ form.non_field_errors }}
+					{% for field in form %}
+					<tr>
+						<td><label>{{ field.label_tag }}</label></td><td>{{ field }}</td>
+					</tr>
+					{% endfor %}
+					<tr><td><input class="btn btn-primary" type="submit" value="Submit"></td></tr>
+				</table>
+			</form>
+		</div>
+	</div>
+	<div class="box-info col-sm-2">
+		<a href="{% url 'new-client' %}" class="btn btn-primary"><i class="fa fa-plus"></i> New Client</a>
+	</div>
+</div>
+{% endblock %}

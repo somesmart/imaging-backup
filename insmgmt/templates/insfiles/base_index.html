@@ -1,0 +1,108 @@
+{% extends "insfiles/base.html" %}
+{% block content %}
+	<!-- Page header -->
+	<div class="page-heading">
+		<h1>Dashboard <small>your first page</small></h1>
+	</div>
+	<!-- End page header -->
+	<!-- Begin info box -->
+	<div class="row">
+		
+		<!-- Visitor Info Box -->
+		<div class="col-sm-4 col-xs-6">
+			<!-- Box info -->
+			<div class="box-info">
+				<!-- Icon box -->
+				<div class="icon-box">
+					<span class="fa-stack">
+					  <i class="fa fa-circle fa-stack-2x success"></i>
+					  <i class="fa fa-flag fa-stack-1x fa-inverse"></i>
+					</span>
+				</div><!-- End div .icon-box -->
+				<!-- Text box -->
+				<div class="text-box">
+					<h3><span class="pendingSpan"></span></h3>
+					<p>Files pending signatures</p>
+				</div><!-- End div .text-box -->
+				<div class="clear"></div>
+			</div><!-- End div .info-box -->
+		</div>
+		<!-- End Visitor Info Box -->
+		
+		
+		<!-- Orders Info Box -->
+		<div class="col-sm-4 col-xs-6">
+			<!-- Box info -->
+			<div class="box-info">
+				<!-- Icon box -->
+				<div class="icon-box">
+					<span class="fa-stack">
+					  <i class="fa fa-circle fa-stack-2x danger"></i>
+					  <i class="fa fa-bell fa-stack-1x fa-inverse"></i>
+					</span>
+				</div><!-- End div .icon-box -->
+				<!-- Text box -->
+				<div class="text-box">
+					<h3>{{ scan_count.scans }}</h3>
+					<p>Items Scanned</p>
+				</div><!-- End div .text-box -->
+				<div class="clear"></div>
+			</div><!-- End div .info-box -->
+		</div>
+		<!-- End Orders Info Box -->
+		
+		
+		<!-- Downloads Info Box -->
+		<div class="col-sm-4 col-xs-6">
+			<!-- Box info -->
+			<div class="box-info">
+				<!-- Icon box -->
+				<div class="icon-box">
+					<span class="fa-stack">
+					  <i class="fa fa-circle fa-stack-2x info"></i>
+					  <i class="fa fa-cloud-upload fa-stack-1x fa-inverse"></i>
+					</span>
+				</div><!-- End div .icon-box -->
+				<!-- Text box -->
+				<div class="text-box">
+					<a href="{% url 'new-scan' %}" class="btn btn-primary btn-lg new-scan">NEW SCAN</a> <!--<a class="btn btn-primary md-trigger" data-modal="form-modal">Form in Modal</a> -->
+				</div><!-- End div .text-box -->
+				<div class="clear"></div>
+			</div><!-- End div .info-box -->
+		</div>
+		<!-- End Downloads Info Box -->		
+	</div>
+	<!-- End of info box -->
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="box-info">
+				<h3>Recently Scanned</h3>
+				<ul class="media-list search-result">
+					{% for scan in latest_scans %}
+					<li class="media">
+						<div class="media-body">
+							<h4 class="media-heading"><a href="{% url 'client-view' scan.client.id %}">{{ scan.client }}</a> {% if scan.signature_required = 1 and scan.signed = 1 %}<span class="label label-success">Signed{% elif scan.signature_required = 0 %}<span class="label label-default">Signature Not Required</span>{% else %}<span class="label label-warning">Not Signed{% endif %}</span></h4>
+							<p><a href="{{ scan.document.url}}">{{ scan.get_document_type_display }}</a> - <a href="{% url 'update-scan' scan.id %}">Edit Scan</a></p>
+						</div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		<div class="col-sm-8">
+			<!-- Website statistic -->
+			<div class="box-info">
+				<h4>Basic Workflow</h4>
+				<ol>
+					<li>Create a <a href="{% url 'new-client' %}">new client</a></li>
+					<li><a href="{% url 'new-scan' %}">Upload recently scanned files</a></li>
+					<li>Monitor <a href="{% url 'unsigned-view' %}">unsigned documents</a></li>
+					<li>Edit scans to note they are now signed.</li>
+					<li>Search for clients to see all their scans in one place.</li>
+				</ol>
+			</div><!-- End div .box-info -->
+		</div>
+		</div><!-- End div .col-sm-4 -->
+	</div><!-- End div .row -->
+	<div class="md-modal md-fade-in-scale-up" id="scan-modal"></div>
+{% endblock content %}

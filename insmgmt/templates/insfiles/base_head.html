@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+{% block head %}
+	<head>
+	{% block title %}<title>Insurance Files Dashboard</title>{% endblock %}
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="description" content="">
+	<meta name="keywords" content="admin, bootstrap,admin template, bootstrap admin, simple, awesome">
+	<meta name="author" content="">
+
+	<!-- BOOTSTRAP -->
+	{% load staticfiles %}
+	<link href="{% static "assets/css/bootstrap.min.css" %}" rel="stylesheet">
+	
+	<!-- LANCENG CSS -->
+	<link href="{% static "assets/css/style.css" %}" rel="stylesheet">
+	<link href="{% static "assets/css/style-responsive.css" %}" rel="stylesheet">
+	
+	<!-- VENDOR -->
+	<link href="{% static "assets/css/animate.css" %}" rel="stylesheet">
+	<link href="{% static "assets/third/font-awesome/css/font-awesome.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/third/weather-icon/css/weather-icons.min.css" %}" rel="stylesheet">
+	<link href="{% static "assets/third/morris/morris.css" %}" rel="stylesheet">
+	<link href="{% static "assets/third/nifty-modal/css/component.css" %}" rel="stylesheet">
+	<link href="{% static "assets/third/sortable/sortable-theme-bootstrap.css" %}" rel="stylesheet"> 
+	<link href="{% static "assets/third/icheck/skins/minimal/grey.css" %}" rel="stylesheet"> 
+	<link href="{% static "assets/third/select/bootstrap-select.min.css" %}" rel="stylesheet"> 
+	<link href="{% static "assets/third/summernote/summernote.css" %}" rel="stylesheet">
+	<link href="{% static "assets/third/magnific-popup/magnific-popup.css" %}" rel="stylesheet"> 
+	<link href="{% static "assets/third/datepicker/css/datepicker.css" %}" rel="stylesheet">
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	<script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+	<![endif]-->
+	
+	<!-- FAVICON -->
+	<link rel="shortcut icon" href="{% static "assets/img/favicon.ico" %}">
+	</head>
+{% endblock head %}
+<!-- BODY --> 
+<body class="tooltips">
+{% block body %}{% endblock %}
+</body>
+{% block base.scripts %}{% endblock %}
+{% block app.scripts %}{% endblock %}
+</html>

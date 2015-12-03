@@ -1,0 +1,25 @@
+{% extends "insfiles/base.html" %}
+{% block content %}
+	<!-- Page header -->
+	<div class="page-heading">
+		<h1>{{ client }} Documents</small></h1>
+		<p><a href="{% url 'update-client' client.id %}" class="btn btn-default">Update Client Name</a></p>
+	</div>
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="box-info">
+				<ul class="media-list search-result">
+					{% for scan in client_scans %}
+					<li class="media">
+						<div class="media-body">
+							<p><a href="{{ scan.document.url }}">{{ scan.get_document_type_display }}</a> {{ scan.scan_date }} {% if scan.signature_required = 1 and scan.signed = 1 %}<span class="label label-success">Signed{% elif scan.signature_required = 0 %}<span class="label label-default">Signature Not Required</span>{% else %}<span class="label label-warning">Not Signed{% endif %}</span></p>
+							<p><a href="{% url 'update-scan' scan.id %}">Edit Scan</a></p>
+						</div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- End of info box -->
+{% endblock content %}

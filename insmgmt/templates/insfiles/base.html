@@ -1,0 +1,151 @@
+{% extends 'insfiles/base_head.html' %}
+{% load staticfiles %}
+{% block body %}
+	<!-- BEGIN PAGE -->
+	<div class="container">
+			
+		<!-- Your logo goes here -->
+		<div class="logo-brand header sidebar rows">
+			<div class="logo">
+				<h1><a href="{% url 'index' %}"><img src="{% static "assets/img/logo.png" %}" alt="Logo"> Insurance Files Admin</a></h1>
+			</div>
+		</div><!-- End div .header .sidebar .rows -->
+	
+		<!-- BEGIN SIDEBAR -->
+		<div class="left side-menu">
+			
+			
+			<div class="body rows scroll-y">
+				
+				<!-- Scrolling sidebar -->
+				<div class="sidebar-inner slimscroller">
+					<!-- Search form -->
+					<div id="search">
+						<form role="form">
+							<input id="search_url" type="hidden" name="search_url">
+							<input id="search_ajax" type="text" class="form-control" placeholder="">
+							<i class="fa fa-search"></i>
+						</form>
+					</div><!-- End div #search -->
+					
+				
+					<!-- Sidebar menu -->				
+					<div id="sidebar-menu">
+						<ul>
+							<li><a href="{% url 'index' %}"><i class="fa fa-home"></i> Dashboard</a></li>
+							<li><a href="{% url 'unsigned-view' %}">Pending Signatures <span class="pendingSpan label label-success new-circle span-left">{% for count in unsigned_count %}{{ count.sig_required }}{% endfor %}</span></a></li>
+						</ul>
+						<div class="clear"></div>
+					</div><!-- End div #sidebar-menu -->
+				</div><!-- End div .sidebar-inner .slimscroller -->
+			</div><!-- End div .body .rows .scroll-y -->
+			
+			<!-- Sidebar footer -->
+			<div class="footer">
+			</div><!-- End div .footer .rows -->
+		</div>
+		<!-- END SIDEBAR -->
+	
+		
+		<!-- BEGIN CONTENT -->
+		<div class="right content-page">
+			<!-- ============================================================== -->
+			<!-- START YOUR CONTENT HERE -->
+			<!-- ============================================================== -->
+			<div class="body content rows scroll-y">
+				{% block content %}{% endblock %}
+			</div>
+			<!-- ============================================================== -->
+			<!-- END YOUR CONTENT HERE -->
+			<!-- ============================================================== -->
+		</div>
+		<!-- END CONTENT -->
+		<div class="md-overlay"></div>
+	</div><!-- End div .container -->
+	<!-- END PAGE -->
+{% endblock body %}
+{% block base.scripts %}
+<!--
+	================================================
+	JAVASCRIPT
+	================================================
+	-->
+	<!-- Basic Javascripts (Jquery and bootstrap) -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="{% static "assets/js/bootstrap.min.js" %}"></script>
+	
+	<!-- VENDOR -->
+	
+	<!-- Slimscroll js -->
+	<script src="{% static "assets/third/slimscroll/jquery.slimscroll.min.js" %}"></script>
+	
+	<!-- Morris js -->
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+	<script src="{% static "assets/third/morris/morris.js" %}"></script>
+	
+	<!-- Sortable js -->
+	<script src="{% static "assets/third/sortable/sortable.min.js" %}"></script>
+	
+	<!-- Bootstrao selectpicker js -->
+	<script src="{% static "assets/third/select/bootstrap-select.min.js" %}"></script>
+	
+	<!-- Summernote js -->
+	<script src="{% static "assets/third/summernote/summernote.js" %}"></script>
+	
+	<!-- Magnific popup js -->
+	<script src="{% static "assets/third/magnific-popup/jquery.magnific-popup.min.js" %}"></script> 
+	
+	<!-- Bootstrap file input js -->
+	<script src="{% static "assets/third/input/bootstrap.file-input.js" %}"></script>
+	
+	<!-- Bootstrao datepicker js -->
+	<script src="{% static "assets/third/datepicker/js/bootstrap-datepicker.js" %}"></script>
+	
+	<!-- Icheck js -->
+	<script src="{% static "assets/third/icheck/icheck.min.js" %}"></script>
+	
+	<!-- Form wizard js -->
+	<!-- <script src="{% static "assets/third/wizard/jquery.snippet.min.js" %}"></script> -->
+	<script src="{% static "assets/third/wizard/jquery.easyWizard.js" %}"></script>
+	<script src="{% static "assets/third/wizard/scripts.js" %}"></script>
+	
+	<!-- LANCENG TEMPLATE JAVASCRIPT -->
+	<script src="{% static "assets/js/lanceng.js" %}"></script>
+
+	<!-- Nifty modals js -->
+	<script src="{% static "assets/third/nifty-modal/js/classie.js" %}"></script>
+	<script src="{% static "assets/third/nifty-modal/js/modalEffects.js" %}"></script>
+<script type="text/javascript">
+
+function get_unsigned() {
+	$.ajax({
+	type: "GET",
+	url: "{% url 'unsigned-stats' %}",
+	success: function(data){
+		$(data).each(function(i,val){
+			 $.each(val,function(k,v){
+				html=val.sig_required;
+			 });
+		});
+			$(".pendingSpan").append(html);
+		}
+	});
+}
+</script>
+<script type="text/javascript">
+	$(function() {
+		$("#search_ajax").autocomplete({
+			source: "{% url 'autocomplete' %}?search=name",
+			/* function( request, response ) {
+          		$.getJSON( "{% url 'autocomplete' %}?search=name", + extractLast(request.term), {term: extractLast( request.term )}, response );
+          	},*/
+			minLength: 3,
+			select: function(event, ui) {
+				window.location.href = ui.item.id;
+			}
+		});
+		get_unsigned();
+	})
+</script>
+{% endblock %}
