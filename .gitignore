@@ -1,2 +1,7 @@
 *.css
 *.js
+insmgmt/insmgmt/settings.py
+*.save
+insmgmt/insmgmt/settings.pyc
+*.jpg
+insmgmt/static/assets/
