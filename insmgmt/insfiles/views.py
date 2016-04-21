@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404, render_to_response, redirect
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views import generic
 from django.db.models import Count, Q
@@ -27,9 +28,9 @@ def autocomplete(request):
 					json_results = json.dumps(results)
 					return HttpResponse(json_results, content_type='application/json')
 				else:
-					return HttpResponseRedirect('/noresults/')
+					return HttpResponseRedirect(reverse('no-results'))
 		else:
-			return HttpResponseRedirect('/noresults/')
+			return HttpResponseRedirect(reverse('no-results'))
 
 class IndexView(generic.ListView):
 	template_name = 'insfiles/base_index.html'
@@ -59,13 +60,13 @@ class ClientView(generic.DetailView):
 class NewClient(generic.CreateView):
 	form_class = NewClientForm
 	template_name = 'insfiles/client_form.html'
-	success_url = '/home/'
+	success_url = reverse_lazy('index')
 
 class UpdateClient(generic.UpdateView):
 	model = Client
 	form_class = NewClientForm
 	template_name = 'insfiles/client_form.html'
-	success_url = '/home/'
+	success_url = reverse_lazy('index')
 
 class UnsignedView(generic.ListView):
 	template_name = 'insfiles/base_unsigned.html'
@@ -77,10 +78,10 @@ class UnsignedView(generic.ListView):
 class NewScanView(generic.CreateView):
 	form_class = NewScanForm
 	template_name = 'insfiles/scan_form.html'
-	success_url = '/home/'
+	success_url = reverse_lazy('index')
 
 class UpdateScan(generic.UpdateView):
 	model = Scan
 	form_class = NewScanForm
 	template_name = 'insfiles/scan_form.html'
-	success_url = '/home/'	
+	success_url = reverse_lazy('index')
