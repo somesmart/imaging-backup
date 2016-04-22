@@ -34,6 +34,7 @@
 						<ul>
 							<li><a href="{% url 'index' %}"><i class="fa fa-home"></i> Dashboard</a></li>
 							<li><a href="{% url 'unsigned-view' %}">Pending Signatures <span class="pendingSpan label label-success new-circle span-left">{% for count in unsigned_count %}{{ count.sig_required }}{% endfor %}</span></a></li>
+							<li><a href="{% url 'scan-directory' %}" id="scanDir">Import Scans</a></li>
 						</ul>
 						<div class="clear"></div>
 					</div><!-- End div #sidebar-menu -->
@@ -53,6 +54,8 @@
 			<!-- START YOUR CONTENT HERE -->
 			<!-- ============================================================== -->
 			<div class="body content rows scroll-y">
+				<div id="message" class="col-sm-12"></div>
+				<div class="row">
 				{% block content %}{% endblock %}
 			</div>
 			<!-- ============================================================== -->
@@ -138,14 +141,32 @@ function get_unsigned() {
 		$("#search_ajax").autocomplete({
 			source: "{% url 'autocomplete' %}?search=name",
 			/* function( request, response ) {
-          		$.getJSON( "{% url 'autocomplete' %}?search=name", + extractLast(request.term), {term: extractLast( request.term )}, response );
-          	},*/
+		  		$.getJSON( "{% url 'autocomplete' %}?search=name", + extractLast(request.term), {term: extractLast( request.term )}, response );
+		  	},*/
 			minLength: 3,
 			select: function(event, ui) {
 				window.location.href = ui.item.id;
 			}
 		});
 		get_unsigned();
+		$("#scanDir").click(function(e){
+			e.preventDefault();
+			$.ajax({
+				url: '{% url "scan-directory" %}',
+				success:function (data) {
+				if (data == 'success')
+				{
+					$("#message")
+					.addClass("success")
+					.html("<div class='alert alert-success alert-dismissable'>New documents found! <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+				}
+				else
+				{
+					$("#message").addClass("error").html("<div class='alert alert-warning alert-dismissable'>No new documents found. <a href='#'' class='close' data-dismiss='alert'>×</a></div>").fadeIn('slow');
+				}
+			  }
+			});
+		});
 	})
 </script>
 {% endblock %}

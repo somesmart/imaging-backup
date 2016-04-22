@@ -4,9 +4,12 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.views import generic
 from django.db.models import Count, Q
 from django.core import serializers
+from django.conf import settings
 import json
 from .models import *
 from .forms import *
+from datetime import datetime
+import os
 
 # ****************************************************************** #
 # ********************* autocomplete views ************************* #
@@ -85,3 +88,29 @@ class UpdateScan(generic.UpdateView):
 	form_class = NewScanForm
 	template_name = 'insfiles/scan_form.html'
 	success_url = reverse_lazy('index')
+
+def scan_directory(request):
+
+	dir_norm = os.path.normpath(settings.SCAN_DIR)
+	dirlist = os.listdir(dir_norm)
+
+	new_location = os.path.normpath(settings.MEDIA_ROOT + "scans/client/1/")
+	if dirlist:
+		client = Client.objects.get(id=1)
+		scan_count = 0
+		for item in dirlist:
+			or_doc = dir_norm + '/' + item
+			doc = new_location + '/' + item
+			os.rename (or_doc, doc)
+			scan_count = scan_count + 1
+			Scan(client=client, document=doc, document_type=4, scan_date=datetime.now(), signature_required=0, signed=0, signed_date=None).save()
+		return HttpResponse(str(scan_count) + " documents found")
+	else:
+		return HttpResponse("no scans")
+
+class PendingView(generic.ListView):
+	template_name = 'insfiles/base_pending.html'
+	context_object_name = 'pending_scans'
+
+	def get_queryset(self):
+		return Scan.objects.select_related().filter(client__id=1)

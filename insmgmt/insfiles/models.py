@@ -13,6 +13,7 @@ class Scan(models.Model):
 		(1, 'Policy'),
 		(2, 'License'),
 		(3, 'Other'),
+		(4, 'Pending'),
 	)
 
 	client = models.ForeignKey(Client)
