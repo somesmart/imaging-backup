@@ -1,5 +1,6 @@
 from django.db import models
 from .functions import get_image_path
+import os
 
 class Client(models.Model):
 	first_name = models.CharField(max_length=200)
@@ -32,3 +33,7 @@ class Scan(models.Model):
 				this.document.delete(save=False)
 		except: pass # when new document then we do nothing, normal case
 		super(Scan, self).save(*args, **kwargs)
+
+	def extension(self):
+		_, extension = os.path.splitext(self.document.url)
+		return extension

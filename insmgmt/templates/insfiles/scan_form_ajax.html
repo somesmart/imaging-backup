@@ -26,10 +26,10 @@
 						<td><label>{{ field.label_tag }}</label></td><td>{{ field }}</td>
 					</tr>
 					{% endfor %}
-					<tr>
-						<td colspan="2"><embed height="100%" width="100%" name="plugin" src="{{ object.document.url }}" type="application/pdf"></td>
-					</tr>
 					<tr><td><input class="btn btn-primary" type="submit" value="Submit"></td></tr>
+					<tr>
+						<td colspan="2">{% if object.extension|lower == ".pdf" %}<embed height="100%" width="100%" name="plugin" src="{{ object.document.url }}" type="application/pdf">{% else %}<img src="{{ object.document.url }}" width="480px" height="auto">{% endif %}</td>
+					</tr>
 				</table>
 			</form>
 		</div>

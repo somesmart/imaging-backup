@@ -20,8 +20,12 @@
 	f. nano /insmgmt/settings.py 
 		i. set database engine to 'django.db.backends.mysql'
 		ii. set database name, user, password
-		iii. STATIC_ROOT = '/var/wwww/static/'
-	f. python manage.py migrate
+		iii. STATIC_ROOT = '/var/wwww/static/
+		iv. SCAN_DIRS = ( '/path/to/scan', '/path/to/scan2', )
+		v. define client for pending review items PENDING_CLIENT = 'scans/client/1/'
+			1. This is the directory where the pending reivew items will be sent when you perform the scan directory. It should always be client 1
+	g. grant pi ownership of scan dirs chown -R pi /path/to/scan/
+	h. python manage.py migrate
 5. Get Web-Serving ready
 	a. install gunicorn
 		i. pip install gunicorn
