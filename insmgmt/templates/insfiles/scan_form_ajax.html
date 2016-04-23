@@ -1,0 +1,52 @@
+{% extends 'insfiles/base_head.html' %}
+{% block body %}
+<div class="md-content">
+<div class="md-close-btn"><a class="md-close"><i class="fa fa-times"></i></a></div>
+	<div class="box-info col-sm-4">
+		<h3>Scan a new file</h3>
+		<div id="basic-form" class="collapse in">
+			<form class="scan-form" role="form" action="" method="post" enctype="multipart/form-data">
+				{% csrf_token %}
+				<table>
+					{{ form.non_field_errors }}
+					<tr>
+						<form action="#" id="autocomplete_form" class="form-horizontal">
+							<td>
+								<label for id="id_client">Client:</label>
+							</td>
+							<td>
+								<input type="text" id="selector" name="selector" value="{{ object.client }}"/>
+								<input type="hidden" id="client" name="client" value="{{ object.client.id }}"/>
+								<input type="hidden" id="client_name" name="client_name" value="{{ object.client }}" />
+							</td>
+						</form>
+					</tr>
+					{% for field in form %}
+					<tr>
+						<td><label>{{ field.label_tag }}</label></td><td>{{ field }}</td>
+					</tr>
+					{% endfor %}
+					<tr>
+						<td colspan="2"><embed height="100%" width="100%" name="plugin" src="{{ object.document.url }}" type="application/pdf"></td>
+					</tr>
+					<tr><td><input class="btn btn-primary" type="submit" value="Submit"></td></tr>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock body %}
+{% block app.scripts %}
+<script>
+$(function() {
+  $("#selector").autocomplete({
+	  source: "{% url 'autocomplete' %}?search=name",
+	  minLength: 3,
+	  select: function(event, ui) {
+		$("#client").val(ui.item.id);
+		$("#client_name").val(ui.item.label);
+	  }
+	});
+});
+</script>
+{% endblock %}

@@ -65,7 +65,7 @@
 				</div><!-- End div .icon-box -->
 				<!-- Text box -->
 				<div class="text-box">
-					<a href="{% url 'new-scan' %}" class="btn btn-primary btn-lg new-scan">NEW SCAN</a> <!--<a class="btn btn-primary md-trigger" data-modal="form-modal">Form in Modal</a> -->
+					<a href="{% url 'new-scan' %}" class="ajax cboxElement btn btn-primary btn-lg new-scan">NEW SCAN</a>
 				</div><!-- End div .text-box -->
 				<div class="clear"></div>
 			</div><!-- End div .info-box -->
@@ -82,7 +82,7 @@
 					<li class="media">
 						<div class="media-body">
 							<h4 class="media-heading"><a href="{% url 'client-view' scan.client.id %}">{{ scan.client }}</a> {% if scan.signature_required = 1 and scan.signed = 1 %}<span class="label label-success">Signed{% elif scan.signature_required = 0 %}<span class="label label-default">Signature Not Required</span>{% else %}<span class="label label-warning">Not Signed{% endif %}</span></h4>
-							<p><a href="{{ scan.document.url}}">{{ scan.get_document_type_display }}</a> - <a href="{% url 'update-scan' scan.id %}">Edit Scan</a></p>
+							<p><a href="{{ scan.document.url}}">{{ scan.get_document_type_display }}</a> - <a id="edit-scan" class="ajax cboxElement btn" href="{% url 'update-scan-ajax' scan.id %}">Edit Scan</a></p>
 						</div>
 					</li>
 					{% endfor %}
@@ -95,8 +95,8 @@
 				<h4>Basic Workflow</h4>
 				<ol>
 					<li>Create a <a href="{% url 'new-client' %}">new client</a></li>
-					<li><a href="{% url 'new-scan' %}">Upload recently scanned files</a></li>
-					<li>Monitor <a href="{% url 'unsigned-view' %}">unsigned documents</a></li>
+					<li><a href="{% url 'new-scan' %}">Upload recently scanned files</a> or <a href="{% url 'scan-directory' %}">process your scan folders</a></li>
+					<li>Monitor <a href="{% url 'unsigned-view' %}">unsigned documents</a> and documents <a href="{% url 'pending-view' %}">needing review</a></li>
 					<li>Edit scans to note they are now signed.</li>
 					<li>Search for clients to see all their scans in one place.</li>
 				</ol>

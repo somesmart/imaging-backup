@@ -11,6 +11,9 @@ from .forms import *
 from datetime import datetime
 import os
 
+def thanks(request):
+	return HttpResponse("<p>Scan information has been updated.</p>")
+
 # ****************************************************************** #
 # ********************* autocomplete views ************************* #
 # ****************************************************************** #
@@ -26,7 +29,7 @@ def autocomplete(request):
 				if len(value) > 3:
 					model_results = Client.objects.filter(Q(last_name__icontains=value) | Q(first_name__icontains=value))
 					for client in model_results:
-						data = {'id': '/client/' + str(client.id) + '/', 'label': client.first_name + ' ' + client.last_name }
+						data = {'id': str(client.id), 'label': client.first_name + ' ' + client.last_name }
 						results.append(data)
 					json_results = json.dumps(results)
 					return HttpResponse(json_results, content_type='application/json')
@@ -50,6 +53,9 @@ class IndexView(generic.ListView):
 
 def get_unsigned(request):
 	return JsonResponse(Scan.objects.filter(signature_required=1, signed=0).aggregate(sig_required=Count('id')))
+
+def get_pending(request):
+	return JsonResponse(Scan.objects.filter(client__id=1).aggregate(pending_review=Count('id')))
 
 class ClientView(generic.DetailView):
 	model = Client
@@ -79,34 +85,50 @@ class UnsignedView(generic.ListView):
 		return Scan.objects.select_related().filter(signed=0, signature_required=1)
 
 class NewScanView(generic.CreateView):
-	form_class = NewScanForm
-	template_name = 'insfiles/scan_form.html'
-	success_url = reverse_lazy('index')
+	form_class = ScanFormAjax
+	template_name = 'insfiles/scan_form_ajax.html'
+	
+	def form_valid (self, form):
+		if form.is_valid():
+			client_id = self.request.POST[u'client']
+			self.client = Client.objects.get(id=client_id)
+			obj = form.save(commit=False) 
+			obj.client = self.client
+			obj.save()
+			return HttpResponseRedirect(reverse('thanks'))
 
-class UpdateScan(generic.UpdateView):
+class UpdateScanAjax(generic.UpdateView):
 	model = Scan
-	form_class = NewScanForm
-	template_name = 'insfiles/scan_form.html'
-	success_url = reverse_lazy('index')
+	form_class = ScanFormAjax
+	template_name = 'insfiles/scan_form_ajax.html'
+
+	def form_valid (self, form):
+		if form.is_valid():
+			client_id = self.request.POST[u'client']
+			self.client = Client.objects.get(id=client_id)
+			obj = form.save(commit=False) 
+			obj.client = self.client
+			obj.save()
+			return HttpResponseRedirect(reverse('thanks'))
 
 def scan_directory(request):
-
-	dir_norm = os.path.normpath(settings.SCAN_DIR)
-	dirlist = os.listdir(dir_norm)
-
-	new_location = os.path.normpath(settings.MEDIA_ROOT + "scans/client/1/")
-	if dirlist:
-		client = Client.objects.get(id=1)
-		scan_count = 0
-		for item in dirlist:
-			or_doc = dir_norm + '/' + item
-			doc = new_location + '/' + item
-			os.rename (or_doc, doc)
-			scan_count = scan_count + 1
-			Scan(client=client, document=doc, document_type=4, scan_date=datetime.now(), signature_required=0, signed=0, signed_date=None).save()
-		return HttpResponse(str(scan_count) + " documents found")
-	else:
-		return HttpResponse("no scans")
+	new_location = os.path.normpath(settings.MEDIA_ROOT + settings.PENDING_CLIENT)
+	scan_count = 0
+	for directory in settings.SCAN_DIRS:
+		dir_norm = os.path.normpath(directory)
+		dirlist = os.listdir(dir_norm)
+		
+		if dirlist:
+			client = Client.objects.get(id=1)
+			for item in dirlist:
+				or_doc = dir_norm + '/' + item
+				doc = new_location + '/' + item
+				os.rename (or_doc, doc)
+				scan_count = scan_count + 1
+				Scan(client=client, document=settings.PENDING_CLIENT + '/' + item, document_type=4, scan_date=datetime.now(), signature_required=0, signed=0, signed_date=None).save()
+			return HttpResponse("1")
+	if scan_count == 0:
+		return HttpResponse("2")
 
 class PendingView(generic.ListView):
 	template_name = 'insfiles/base_pending.html'

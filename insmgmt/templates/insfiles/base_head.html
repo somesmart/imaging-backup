@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html>
 {% block head %}
@@ -31,6 +32,7 @@
 	<link href="{% static "assets/third/magnific-popup/magnific-popup.css" %}" rel="stylesheet"> 
 	<link href="{% static "assets/third/datepicker/css/datepicker.css" %}" rel="stylesheet">
 	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="{% static 'css/colorbox/colorbox.css' %}">
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -47,6 +49,11 @@
 <body class="tooltips">
 {% block body %}{% endblock %}
 </body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script src="{% static "assets/js/bootstrap.min.js" %}"></script>
+{% load js %}
+{% django_js jquery=false i18n=false csrf=false %}
 {% block base.scripts %}{% endblock %}
 {% block app.scripts %}{% endblock %}
 </html>

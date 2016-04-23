@@ -33,8 +33,9 @@
 					<div id="sidebar-menu">
 						<ul>
 							<li><a href="{% url 'index' %}"><i class="fa fa-home"></i> Dashboard</a></li>
-							<li><a href="{% url 'unsigned-view' %}">Pending Signatures <span class="pendingSpan label label-success new-circle span-left">{% for count in unsigned_count %}{{ count.sig_required }}{% endfor %}</span></a></li>
-							<li><a href="{% url 'scan-directory' %}" id="scanDir">Import Scans</a></li>
+							<li><a href="{% url 'unsigned-view' %}">Pending Signatures <span class="unsignedSpan label label-success new-circle span-left">{% for count in unsigned_count %}{{ count.sig_required }}{% endfor %}</span></a></li>
+							<li><a href="{% url 'pending-view' %}">Pending Review <span class="pendingSpan label label-success new-circle span-left"></span></a></li>
+							<li><a href="{% url 'scan-directory' %}" id="scanDir">Process Scan Folder</a></li>
 						</ul>
 						<div class="clear"></div>
 					</div><!-- End div #sidebar-menu -->
@@ -74,9 +75,6 @@
 	================================================
 	-->
 	<!-- Basic Javascripts (Jquery and bootstrap) -->
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
-	<script src="{% static "assets/js/bootstrap.min.js" %}"></script>
 	
 	<!-- VENDOR -->
 	
@@ -119,6 +117,7 @@
 	<!-- Nifty modals js -->
 	<script src="{% static "assets/third/nifty-modal/js/classie.js" %}"></script>
 	<script src="{% static "assets/third/nifty-modal/js/modalEffects.js" %}"></script>
+	<script type="text/javascript" src="{% static 'css/colorbox/jquery.colorbox-min.js' %}"></script>
 <script type="text/javascript">
 
 function get_unsigned() {
@@ -129,6 +128,21 @@ function get_unsigned() {
 		$(data).each(function(i,val){
 			 $.each(val,function(k,v){
 				html=val.sig_required;
+			 });
+		});
+			$(".unsignedSpan").append(html);
+		}
+	});
+}
+
+function get_pending() {
+	$.ajax({
+	type: "GET",
+	url: "{% url 'pending-stats' %}",
+	success: function(data){
+		$(data).each(function(i,val){
+			 $.each(val,function(k,v){
+				html=val.pending_review;
 			 });
 		});
 			$(".pendingSpan").append(html);
@@ -145,16 +159,17 @@ function get_unsigned() {
 		  	},*/
 			minLength: 3,
 			select: function(event, ui) {
-				window.location.href = ui.item.id;
+				window.location.href = Django.url('client-view', ui.item.id);
 			}
 		});
 		get_unsigned();
+		get_pending();
 		$("#scanDir").click(function(e){
 			e.preventDefault();
 			$.ajax({
 				url: '{% url "scan-directory" %}',
 				success:function (data) {
-				if (data == 'success')
+				if (data == '1')
 				{
 					$("#message")
 					.addClass("success")
@@ -168,5 +183,8 @@ function get_unsigned() {
 			});
 		});
 	})
+</script>
+<script>
+	$(".ajax").colorbox({height:"650px", width:"565px", iframe:true, onClosed:function(){window.location.reload();}});
 </script>
 {% endblock %}

@@ -13,7 +13,7 @@
 					<li class="media">
 						<div class="media-body">
 							<p><a href="{{ scan.document.url }}">{{ scan.get_document_type_display }}</a> {{ scan.scan_date }} {% if scan.signature_required = 1 and scan.signed = 1 %}<span class="label label-success">Signed{% elif scan.signature_required = 0 %}<span class="label label-default">Signature Not Required</span>{% else %}<span class="label label-warning">Not Signed{% endif %}</span></p>
-							<p><a href="{% url 'update-scan' scan.id %}">Edit Scan</a></p>
+							<p><a id="edit-scan" class="ajax cboxElement btn" href="{% url 'update-scan-ajax' scan.id %}">Edit Scan</a></p>
 						</div>
 					</li>
 					{% endfor %}
