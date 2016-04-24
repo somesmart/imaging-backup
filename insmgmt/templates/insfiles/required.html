@@ -1,0 +1,3 @@
+{% for field in required %}
+<li><a href="{% if not field.url_arg %}{% url field.url %}{% else %}{% url field.url field.url_arg %}{% endif %}">{{ field.type }}<span class="unsignedSpan label label-success new-circle span-left">{{ field.count }}</span></a></li>
+{% endfor %}

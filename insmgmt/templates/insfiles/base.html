@@ -1,5 +1,6 @@
 {% extends 'insfiles/base_head.html' %}
 {% load staticfiles %}
+{% load insfiles_extras %}
 {% block body %}
 	<!-- BEGIN PAGE -->
 	<div class="container">
@@ -31,11 +32,9 @@
 				
 					<!-- Sidebar menu -->				
 					<div id="sidebar-menu">
-						<ul>
+						<ul class="sidebar-ul">
 							<li><a href="{% url 'index' %}"><i class="fa fa-home"></i> Dashboard</a></li>
-							<li><a href="{% url 'unsigned-view' %}">Pending Signatures <span class="unsignedSpan label label-success new-circle span-left">{% for count in unsigned_count %}{{ count.sig_required }}{% endfor %}</span></a></li>
-							<li><a href="{% url 'pending-view' %}">Pending Review <span class="pendingSpan label label-success new-circle span-left"></span></a></li>
-							<li><a href="{% url 'scan-directory' %}" id="scanDir">Process Scan Folder</a></li>
+							{% get_required_stats %}
 						</ul>
 						<div class="clear"></div>
 					</div><!-- End div #sidebar-menu -->
@@ -119,53 +118,6 @@
 	<script src="{% static "assets/third/nifty-modal/js/modalEffects.js" %}"></script>
 	<script type="text/javascript" src="{% static 'css/colorbox/jquery.colorbox-min.js' %}"></script>
 <script type="text/javascript">
-
-function get_unsigned() {
-	$.ajax({
-	type: "GET",
-	url: "{% url 'unsigned-stats' %}",
-	success: function(data){
-		$(data).each(function(i,val){
-			 $.each(val,function(k,v){
-				html=val.sig_required;
-			 });
-		});
-			$(".unsignedSpan").append(html);
-		}
-	});
-}
-
-function get_pending() {
-	$.ajax({
-	type: "GET",
-	url: "{% url 'pending-stats' %}",
-	success: function(data){
-		$(data).each(function(i,val){
-			 $.each(val,function(k,v){
-				html=val.pending_review;
-			 });
-		});
-			$(".pendingSpan").append(html);
-		}
-	});
-}
-
-function get_stats() {
-	$.ajax({
-	type: "GET",
-	url: "{% url 'stats-view' %}",
-	success: function(data){
-		$(data).each(function(i,val){
-			 $.each(val,function(k,v){
-				html=val.pending_review;
-			 });
-		});
-			$(".pendingSpan").append(html);
-		}
-	});
-}
-</script>
-<script type="text/javascript">
 	$(function() {
 		$("#search_ajax").autocomplete({
 			source: "{% url 'autocomplete' %}?search=name",
@@ -177,9 +129,6 @@ function get_stats() {
 				window.location.href = Django.url('client-view', ui.item.id);
 			}
 		});
-		/*get_unsigned();
-		get_pending();*/
-		get_stats();
 		$("#scanDir").click(function(e){
 			e.preventDefault();
 			$.ajax({

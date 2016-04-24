@@ -51,35 +51,6 @@ class IndexView(generic.ListView):
 		context['scan_count'] = Scan.objects.aggregate(scans=Count('id'))
 		return context
 
-def get_unsigned(request):
-	return JsonResponse(Scan.objects.filter(signature_required=1, signed=0).aggregate(sig_required=Count('id')))
-
-def get_pending(request):
-	return JsonResponse(Scan.objects.filter(client__id=1).aggregate(pending_review=Count('id')))
-
-def get_stats(request):
-	results = []
-	signature_required = Scan.objects.filter(signature_required=1, signed=0).aggregate(sig_required=Count('id'))
-	pending_review = Scan.objects.filter(client__id=1).aggregate(pending_review=Count('id'))
-	if signature_required:
-		data = {'type': 'signature_required', 'count': signature_required['sig_required']}
-		results.append(data)
-	if pending_review:
-		data = {'type': 'pending_review', 'count': pending_review['pending_review']}
-		results.append(data)
-	extended_values = ExtensionType.objects.filter(required=True)
-	if extended_values:
-		for extended_value in extended_values:
-			extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value).aggregate(ext_count=Count('scan__id'))
-			data = {'type': extended_value.description, 'count': extended_count['ext_count']}
-			results.append(data)
-	json_results = json.dumps(results)
-	if json_results:
-		return HttpResponse(json_results, content_type='application/json')
-	else:
-		return HttpResponseRedirect(reverse('no-results'))
-
-
 class ClientView(generic.DetailView):
 	model = Client
 	template_name = 'insfiles/base_client.html'
@@ -101,8 +72,8 @@ class UpdateClient(generic.UpdateView):
 	success_url = reverse_lazy('index')
 
 class UnsignedView(generic.ListView):
-	template_name = 'insfiles/base_unsigned.html'
-	context_object_name = 'unsigned_scans'
+	template_name = 'insfiles/base_required.html'
+	context_object_name = 'required_list'
 
 	def get_queryset(self):
 		return Scan.objects.select_related().filter(signed=0, signature_required=1)
@@ -154,8 +125,16 @@ def scan_directory(request):
 		return HttpResponse("2")
 
 class PendingView(generic.ListView):
-	template_name = 'insfiles/base_pending.html'
-	context_object_name = 'pending_scans'
+	template_name = 'insfiles/base_required.html'
+	context_object_name = 'required_list'
 
 	def get_queryset(self):
 		return Scan.objects.select_related().filter(client__id=1)
+
+class ExtensionTypeView(generic.ListView):
+	template_name = 'insfiles/base_required.html'
+	context_object_name = 'required_list'
+
+	def get_queryset(self):
+		extension_type = ExtensionType.objects.get(id=self.kwargs['pk'])
+		return Scan.objects.select_related().filter(extensionfield__extensiontype=extension_type)

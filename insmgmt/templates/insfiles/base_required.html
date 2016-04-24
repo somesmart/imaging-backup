@@ -8,7 +8,7 @@
 		<div class="col-sm-4">
 			<div class="box-info">
 				<ul class="media-list search-result">
-					{% for scan in unsigned_scans %}
+					{% for scan in required_list %}
 					<li class="media">
 						<div class="media-body">
 							<p><a href="{% url 'client-view' scan.client.id %}">{{ scan.client }}</a> <a href="{{ scan.document.url }}">{{ scan.get_document_type_display }} - {{ scan.scan_date }}</a>{% if scan.signature_required = 1 and scan.signed = 1 %}<span class="label label-success">Signed{% elif scan.signature_required = 0 %}<span class="label label-default">Signature Not Required</span>{% else %}<span class="label label-warning">Not Signed{% endif %}</span></p>
