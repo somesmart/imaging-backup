@@ -149,6 +149,21 @@ function get_pending() {
 		}
 	});
 }
+
+function get_stats() {
+	$.ajax({
+	type: "GET",
+	url: "{% url 'stats-view' %}",
+	success: function(data){
+		$(data).each(function(i,val){
+			 $.each(val,function(k,v){
+				html=val.pending_review;
+			 });
+		});
+			$(".pendingSpan").append(html);
+		}
+	});
+}
 </script>
 <script type="text/javascript">
 	$(function() {
@@ -162,8 +177,9 @@ function get_pending() {
 				window.location.href = Django.url('client-view', ui.item.id);
 			}
 		});
-		get_unsigned();
-		get_pending();
+		/*get_unsigned();
+		get_pending();*/
+		get_stats();
 		$("#scanDir").click(function(e){
 			e.preventDefault();
 			$.ajax({

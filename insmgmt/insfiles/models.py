@@ -37,3 +37,23 @@ class Scan(models.Model):
 	def extension(self):
 		_, extension = os.path.splitext(self.document.url)
 		return extension
+
+class ExtensionType(models.Model):
+	DATATYPE = (
+		(1, 'char_value'),
+		(2, 'date_value'),
+		(3, 'bool_value'),
+	)
+	description = models.CharField(max_length=200)
+	required = models.BooleanField()
+	data_type = models.IntegerField(choices=DATATYPE)
+
+	def __unicode__(self):
+		return unicode(self.description)
+
+class ExtensionField(models.Model):
+	extensiontype = models.ForeignKey(ExtensionType)
+	scan = models.ForeignKey(Scan)
+	char_value = models.CharField(max_length=200, blank=True, null=True)
+	date_value = models.DateTimeField(blank=True, null=True)
+	bool_value = models.BooleanField()

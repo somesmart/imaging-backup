@@ -24,8 +24,10 @@
 		iv. SCAN_DIRS = ( '/path/to/scan', '/path/to/scan2', )
 		v. define client for pending review items PENDING_CLIENT = 'scans/client/1/'
 			1. This is the directory where the pending reivew items will be sent when you perform the scan directory. It should always be client 1
+		vi. add djangojs to installed apps
 	g. grant pi ownership of scan dirs chown -R pi /path/to/scan/
-	h. python manage.py migrate
+	h. install djangojs pip install djangojs
+	i. python manage.py migrate
 5. Get Web-Serving ready
 	a. install gunicorn
 		i. pip install gunicorn
