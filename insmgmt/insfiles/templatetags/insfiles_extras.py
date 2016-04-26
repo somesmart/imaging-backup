@@ -32,12 +32,12 @@ def get_required_stats():
 	return results
 
 @register.inclusion_tag('insfiles/extension_fields.html')
-def get_extension_fields():
+def get_extension_fields(scan):
 	results = []
 	extended_values = ExtensionType.objects.filter(required=True)
 	if extended_values:
 		for extended_value in extended_values:
-			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extended_value)
+			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extended_value, id=scan)
 			extension_fields = ExtensionField.objects.select_related().filter(scan__in=scans)
 			results = {'extension_fields': extension_fields }
 	return results

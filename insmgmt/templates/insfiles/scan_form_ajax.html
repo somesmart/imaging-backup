@@ -28,7 +28,7 @@
 						<td><label>{{ field.label_tag }}</label></td><td>{{ field }}</td>
 					</tr>
 					{% endfor %}
-					{% get_extension_fields %}
+					{% get_extension_fields object.id %}
 					<tr><td><input class="btn btn-primary" type="submit" value="Submit"></td></tr>
 				</table>
 			</form>
