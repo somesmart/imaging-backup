@@ -1,0 +1,5 @@
+{% for field in extension_fields %}
+<tr>
+	<td><label>{{ field.extensiontype }}</label></td><td><input id="{{ field.extensiontype|slugify }}" name="{{ field.extensiontype|slugify }}" type="{% with data_type=field.extensiontype.get_data_type_display %}{% if data_type == 'bool_value' %}checkbox{% else %}text{% endif %}" class="{% if data_type == 'date_value' %}hasDatepicker{% endif %}" value="{% if data_type == 'bool_value' %}{{ field.bool_value }}{% elif data_type == 'date_value' %}{{ field.date_value }}{% else %}{{ field.char_value }}{% endif %}{% endwith %}"></td>
+</tr>
+{% endfor %}

@@ -1,6 +1,7 @@
 from django import template
 from insfiles.models import *
 from django.db.models import Count
+from django.core.exceptions import ObjectDoesNotExist
 
 register = template.Library()
 
@@ -18,8 +19,25 @@ def get_required_stats():
 	extended_values = ExtensionType.objects.filter(required=True)
 	if extended_values:
 		for extended_value in extended_values:
-			extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value).aggregate(ext_count=Count('scan__id'))
-			data = {'type': extended_value.description, 'count': extended_count['ext_count'], 'url': 'type-view', 'url_arg': extended_value.id}
+			if extended_value.get_data_type_display() == 'bool_value':
+				extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value, bool_value=False).aggregate(ext_count=Count('scan__id'))
+			else:
+				extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value).filter(**{ extended_value.get_data_type_display(): None})	
+			try:
+				data = {'type': extended_value.description, 'count': extended_count['ext_count'], 'url': 'type-view', 'url_arg': extended_value.id}
+			except ObjectDoesNotExist:
+				pass
 			results.append(data)
 	results = {'required': results}
+	return results
+
+@register.inclusion_tag('insfiles/extension_fields.html')
+def get_extension_fields():
+	results = []
+	extended_values = ExtensionType.objects.filter(required=True)
+	if extended_values:
+		for extended_value in extended_values:
+			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extended_value)
+			extension_fields = ExtensionField.objects.select_related().filter(scan__in=scans)
+			results = {'extension_fields': extension_fields }
 	return results

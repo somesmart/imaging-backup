@@ -1,4 +1,6 @@
 {% extends 'insfiles/base_head.html' %}
+{% load insfiles_extras %}
+{% load staticfiles %}
 {% block body %}
 <div class="md-content">
 <div class="md-close-btn"><a class="md-close"><i class="fa fa-times"></i></a></div>
@@ -26,17 +28,17 @@
 						<td><label>{{ field.label_tag }}</label></td><td>{{ field }}</td>
 					</tr>
 					{% endfor %}
+					{% get_extension_fields %}
 					<tr><td><input class="btn btn-primary" type="submit" value="Submit"></td></tr>
-					<tr>
-						<td colspan="2">{% if object.extension|lower == ".pdf" %}<embed height="100%" width="100%" name="plugin" src="{{ object.document.url }}" type="application/pdf">{% else %}<img src="{{ object.document.url }}" width="480px" height="auto">{% endif %}</td>
-					</tr>
 				</table>
 			</form>
+			{% if object.extension|lower == ".pdf" %}<embed height="400px" width="100%" name="plugin" src="{{ object.document.url }}" type="application/pdf">{% else %}<img src="{{ object.document.url }}" width="480px" height="auto">{% endif %}
 		</div>
 	</div>
 </div>
 {% endblock body %}
 {% block app.scripts %}
+<script src="{% static 'js/jquery-ui-timepicker-addon.js' %}"></script>
 <script>
 $(function() {
   $("#selector").autocomplete({

@@ -100,6 +100,9 @@ class UpdateScanAjax(generic.UpdateView):
 		if form.is_valid():
 			client_id = self.request.POST[u'client']
 			self.client = Client.objects.get(id=client_id)
+			###################################################
+			# need to add code to handle extension fields here#
+			###################################################
 			obj = form.save(commit=False) 
 			obj.client = self.client
 			obj.save()
@@ -131,10 +134,19 @@ class PendingView(generic.ListView):
 	def get_queryset(self):
 		return Scan.objects.select_related().filter(client__id=1)
 
+class NewTypeView(generic.CreateView):
+	form_class = TypeFormAjax
+	template_name = 'insfiles/type_form_ajax.html'
+
 class ExtensionTypeView(generic.ListView):
 	template_name = 'insfiles/base_required.html'
 	context_object_name = 'required_list'
 
 	def get_queryset(self):
 		extension_type = ExtensionType.objects.get(id=self.kwargs['pk'])
-		return Scan.objects.select_related().filter(extensionfield__extensiontype=extension_type)
+		# need to update this so it checks if the required field is blank
+		if extension_type.get_data_type_display() == 'bool_value':
+			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extension_type, extensionfield__bool_value=False)
+		else:
+			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extension_type).filter(**{ 'extensionfield__' + extension_type.get_data_type_display(): None})
+		return scans
