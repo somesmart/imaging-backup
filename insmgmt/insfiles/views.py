@@ -5,6 +5,7 @@ from django.views import generic
 from django.db.models import Count, Q
 from django.core import serializers
 from django.conf import settings
+from django.template.defaultfilters import slugify
 import json
 from .models import *
 from .forms import *
@@ -89,6 +90,10 @@ class NewScanView(generic.CreateView):
 			obj = form.save(commit=False) 
 			obj.client = self.client
 			obj.save()
+			extended_values = ExtensionType.objects.filter(required=True)
+			if extended_values:
+				for extended_value in extended_values:
+					ExtensionField(extensiontype=extended_value, scan=obj, char_value=None, date_value=None, bool_value=False).save()
 			return HttpResponseRedirect(reverse('thanks'))
 
 class UpdateScanAjax(generic.UpdateView):
@@ -96,14 +101,23 @@ class UpdateScanAjax(generic.UpdateView):
 	form_class = ScanFormAjax
 	template_name = 'insfiles/scan_form_ajax.html'
 
-	def form_valid (self, form):
+	def form_valid(self, form):
 		if form.is_valid():
+			obj = form.save(commit=False) 
 			client_id = self.request.POST[u'client']
 			self.client = Client.objects.get(id=client_id)
-			###################################################
-			# need to add code to handle extension fields here#
-			###################################################
-			obj = form.save(commit=False) 
+			# save extension field values
+			extension_fields = ExtensionField.objects.select_related().filter(scan__id=obj.id)
+			for field in extension_fields:
+				field_type = field.extensiontype.get_data_type_display()
+				field_name = slugify(field.extensiontype.description)
+				if field_type == 'bool_value':
+					field.bool_value = self.request.POST[field_name]
+				elif field_type == 'char_value':
+					field.char_value = self.request.POST[field_name]
+				elif field_type == 'date_value':
+					field.date_value = self.request.POST[field_name]
+				field.save()
 			obj.client = self.client
 			obj.save()
 			return HttpResponseRedirect(reverse('thanks'))
@@ -122,7 +136,12 @@ def scan_directory(request):
 				doc = new_location + '/' + item
 				os.rename (or_doc, doc)
 				scan_count = scan_count + 1
-				Scan(client=client, document=settings.PENDING_CLIENT + '/' + item, document_type=4, scan_date=datetime.now(), signature_required=0, signed=0, signed_date=None).save()
+				scan = Scan(client=client, document=settings.PENDING_CLIENT + '/' + item, document_type=4, scan_date=datetime.now(), signature_required=0, signed=0, signed_date=None)
+				scan.save()
+				extended_values = ExtensionType.objects.filter(required=True)
+				if extended_values:
+					for extended_value in extended_values:
+						ExtensionField(extensiontype=extended_value, scan=scan, char_value=None, date_value=None, bool_value=False).save()
 			return HttpResponse("1")
 	if scan_count == 0:
 		return HttpResponse("2")
@@ -142,11 +161,12 @@ class ExtensionTypeView(generic.ListView):
 	template_name = 'insfiles/base_required.html'
 	context_object_name = 'required_list'
 
+	#If we add a new extension type do we want to create a blank entry for all scans already in the system, or just leave it as a going forward concern?
 	def get_queryset(self):
 		extension_type = ExtensionType.objects.get(id=self.kwargs['pk'])
-		# need to update this so it checks if the required field is blank
 		if extension_type.get_data_type_display() == 'bool_value':
-			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extension_type, extensionfield__bool_value=False)
+			extension_fields = ExtensionField.objects.select_related().filter(extensiontype=extension_type, bool_value=True).values('scan__id')
 		else:
-			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extension_type).filter(**{ 'extensionfield__' + extension_type.get_data_type_display(): None})
+			extension_fields = ExtensionField.objects.select_related().exclude(extensiontype=extension_type).filter(**{ extension_type.get_data_type_display(): None}).values('scan__id')
+		scans = Scan.objects.select_related().exclude(pk__in=extension_fields)
 		return scans

@@ -22,12 +22,6 @@ class ExtensionType(models.Model):
 	def __unicode__(self):
 		return unicode(self.description)
 
-class ExtensionField(models.Model):
-	extensiontype = models.ForeignKey(ExtensionType)
-	char_value = models.CharField(max_length=200, blank=True, null=True)
-	date_value = models.DateTimeField(blank=True, null=True)
-	bool_value = models.BooleanField()
-
 class Scan(models.Model):
 	DOCTYPE = (
 		(1, 'Policy'),
@@ -43,7 +37,6 @@ class Scan(models.Model):
 	signature_required = models.BooleanField()
 	signed = models.BooleanField(default=False)
 	signed_date = models.DateTimeField(blank=True, null=True)
-	extensionfield = models.ForeignKey(ExtensionField)
 
 	def save(self, *args, **kwargs):
 		# delete old file when replacing by updating the file
@@ -57,3 +50,16 @@ class Scan(models.Model):
 	def extension(self):
 		_, extension = os.path.splitext(self.document.url)
 		return extension
+
+	def __unicode__(self):
+		return unicode(self.client)
+
+class ExtensionField(models.Model):
+	extensiontype = models.ForeignKey(ExtensionType)
+	scan = models.ForeignKey(Scan)
+	char_value = models.CharField(max_length=200, blank=True, null=True)
+	date_value = models.DateTimeField(blank=True, null=True)
+	bool_value = models.BooleanField()
+
+	def __unicode__(self):
+		return u'%s %s' % (self.extensiontype, self.bool_value)

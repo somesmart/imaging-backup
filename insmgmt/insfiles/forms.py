@@ -19,3 +19,4 @@ class ExtensionFieldForm(ModelForm):
 		fields = '__all__'
 
 TypeFormAjax = inlineformset_factory(ExtensionType, ExtensionField, form=ExtensionFieldForm, fields='__all__')
+ExtensionFieldFormset = inlineformset_factory(Scan, ExtensionField, form=ExtensionFieldForm)

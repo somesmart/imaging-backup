@@ -34,6 +34,7 @@
 					<div id="sidebar-menu">
 						<ul class="sidebar-ul">
 							<li><a href="{% url 'index' %}"><i class="fa fa-home"></i> Dashboard</a></li>
+							<li><a href="#" class="scanDir">Import Scanned Files</a></li>
 							{% get_required_stats %}
 						</ul>
 						<div class="clear"></div>
@@ -129,7 +130,7 @@
 				window.location.href = Django.url('client-view', ui.item.id);
 			}
 		});
-		$("#scanDir").click(function(e){
+		$(".scanDir").click(function(e){
 			e.preventDefault();
 			$.ajax({
 				url: '{% url "scan-directory" %}',

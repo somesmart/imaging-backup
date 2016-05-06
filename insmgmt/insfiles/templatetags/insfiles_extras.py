@@ -18,13 +18,17 @@ def get_required_stats():
 		results.append(data)
 	extended_values = ExtensionType.objects.filter(required=True)
 	if extended_values:
+		scans = Scan.objects.aggregate(scans=Count('id'))
+		total_extended = scans['scans']
 		for extended_value in extended_values:
 			if extended_value.get_data_type_display() == 'bool_value':
-				extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value, bool_value=False).aggregate(ext_count=Count('scan__id'))
+				extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value, bool_value=True).aggregate(ext_count=Count('scan__id'))
+				total_extended = total_extended - extended_count['ext_count']
 			else:
-				extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value).filter(**{ extended_value.get_data_type_display(): None})	
+				extended_count = ExtensionField.objects.select_related().filter(extensiontype=extended_value).exclude(**{ extended_value.get_data_type_display(): None})	
+				total_extended = total_extended - extended_count['ext_count']
 			try:
-				data = {'type': extended_value.description, 'count': extended_count['ext_count'], 'url': 'type-view', 'url_arg': extended_value.id}
+				data = {'type': extended_value.description, 'count': total_extended, 'url': 'type-view', 'url_arg': extended_value.id}
 			except ObjectDoesNotExist:
 				pass
 			results.append(data)
@@ -34,10 +38,12 @@ def get_required_stats():
 @register.inclusion_tag('insfiles/extension_fields.html')
 def get_extension_fields(scan):
 	results = []
-	extended_values = ExtensionType.objects.filter(required=True)
-	if extended_values:
-		for extended_value in extended_values:
-			scans = Scan.objects.select_related().filter(extensionfield__extensiontype=extended_value, id=scan)
-			extension_fields = ExtensionField.objects.select_related().filter(scan__in=scans)
-			results = {'extension_fields': extension_fields }
+	try:
+		extension_fields = ExtensionField.objects.select_related().filter(scan__id=scan)
+	except:
+		extended_values = ExtensionType.objects.filter(required=True)
+		if extended_values:
+			for extended_value in extended_values:
+				extension_fields = ExtensionField(extensiontype=extended_value, scan=self.scan, char_value='', date_value='', bool_value=False)
+	results = {'extension_fields': extension_fields }
 	return results
